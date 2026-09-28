@@ -1,4 +1,4 @@
-# smartform-cli
+# SmartForm CLI — inspect and test form submissions from your terminal
 
 Tiny command-line helper to inspect and test your SmartForm AI forms from the terminal.
 
