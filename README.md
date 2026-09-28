@@ -2,6 +2,21 @@
 
 Tiny command-line helper to inspect and test your SmartForm AI forms from the terminal.
 
+## Reserved fields reference
+
+The CLI forwards every flag to the API as a body field. Names starting
+with `_` are reserved by the API:
+
+| CLI flag | API field | Behaviour |
+|---|---|---|
+| `--next <url>` | `_next` | Same-origin redirect URL. Sent in JSON body; API echoes it back in `next_url`. |
+| `--subject <s>` | `_subject` | Overrides the AI-default email subject (max 200 chars). |
+| `--honeypot` | `_gotcha` (non-empty) | Simulates a bot submission to verify the spam drop path. |
+| anything else | as-is | Stored as a submission field, surfaced in the dashboard. |
+
+Honeypot fields are silently dropped server-side, so spam-test runs do
+not pollute the submissions table.
+
 ## Install
 
 ```bash
@@ -68,20 +83,32 @@ Both `verify` and `submit` print the JSON response to stdout. Non-2xx exits 1.
   silently discarded).
 
 For the full contract, see https://usesmartform.com/docs.
-## Related examples
-[smartform-js SDK](https://github.com/yanghuai123456/smartform-js) | [Astro contact form](https://github.com/yanghuai123456/smartform-example-astro) | [Next.js contact form](https://github.com/yanghuai123456/smartform-example-nextjs)
 
 
 ## FAQ
 
 ### Why use this instead of Formspree?
 
-Both SmartForm and Formspree let you POST a plain HTML form to a hosted
-endpoint with no backend. SmartForm adds an AI spam filter (not just
-honeypots), AI intent classification (`sales` / `support` / `inquiry`)
-and high-value lead detection, with a free tier that includes the spam
-filter. Formspree charges per submission; SmartForm's spam filter is
-free on every plan.
+At the basic level, SmartForm and Formspree are very similar: get a
+form ID, POST a plain HTML form to a hosted endpoint with `_gotcha`
+for spam filtering, and the API delivers the submission. The reserved
+fields (`_gotcha`, `_next`, `_subject`, honeypot aliases) are
+Formspree-compatible — a migration does not require renaming
+anything.
+
+The differences are operational, not API surface:
+
+- **No email confirmation flow.** Formspree requires verifying your
+  domain before submissions reach your inbox; SmartForm submissions
+  land in your dashboard immediately.
+- **AI spam filtering on the free tier.** Formspree's free tier uses
+  only a honeypot field, which catches naive bots but lets semantic
+  spam through. SmartForm applies AI-based classification by default,
+  free of charge.
+- **AI intent classification** (`sales` / `support` / `inquiry`
+  / `spam`) on the Pro tier, for routing submissions without writing
+  rules yourself.
+- **No per-submission metering** on the basic plan.
 
 ### Is there a free tier?
 
