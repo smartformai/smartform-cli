@@ -1,0 +1,14 @@
+{
+  "name": "smartform-cli",
+  "version": "0.1.0",
+  "description": "Tiny CLI for inspecting and submitting to SmartForm AI forms.",
+  "type": "module",
+  "bin": { "smartform-cli": "bin/smartform-cli.js" },
+  "main": "bin/smartform-cli.js",
+  "scripts": {
+    "test": "node test/run.mjs"
+  },
+  "engines": { "node": ">=18" },
+  "files": ["bin", "lib", "README.md"],
+  "license": "MIT"
+}
